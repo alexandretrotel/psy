@@ -1,6 +1,4 @@
-import { db } from "@/db";
-import { chats, summaries } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { db } from "./db";
 import { model } from "./ai";
 import { streamText } from "ai";
 
@@ -9,39 +7,24 @@ const getTodayDate = () => new Date().toISOString().split("T")[0];
 
 export async function getOrCreateTodayChat() {
   const today = getTodayDate();
-
-  let chat = await db.select().from(chats).where(eq(chats.date, today)).get();
+  let chat = await db.chats.where({ date: today }).first();
   if (!chat) {
-    await db.insert(chats).values({
-      date: today,
-      messages: JSON.stringify([]),
-      createdAt: new Date(),
-    });
-
-    chat = await db.select().from(chats).where(eq(chats.date, today)).get();
+    chat = { date: today, messages: [], createdAt: new Date() };
+    const id = await db.chats.add(chat);
+    chat.id = id;
   }
-
   return chat;
 }
 
 export async function addMessageToChat(message: string, aiResponse: string) {
-  const today = getTodayDate();
   const chat = await getOrCreateTodayChat();
-  const messages = JSON.parse(chat?.messages || "[]") as Array<{
-    user: string;
-    ai: string;
-  }>;
-
+  const messages = chat.messages;
   messages.push({ user: message, ai: aiResponse });
-
-  await db
-    .update(chats)
-    .set({ messages: JSON.stringify(messages) })
-    .where(eq(chats.date, today));
+  await db.chats.update(chat.id!, { messages });
 }
 
 export async function getAllChats() {
-  return db.select().from(chats);
+  return db.chats.toArray();
 }
 
 export async function generateSummary() {
@@ -52,7 +35,7 @@ export async function generateSummary() {
 
   const chatContents = allChats.map((chat) => ({
     date: chat.date,
-    messages: JSON.parse(chat.messages as string),
+    messages: chat.messages,
   }));
 
   const result = streamText({
@@ -63,7 +46,7 @@ export async function generateSummary() {
       2,
     )}`,
     onFinish: async (result) => {
-      await db.insert(summaries).values({
+      await db.summaries.add({
         summary: result.text,
         generatedAt: new Date(),
       });
@@ -74,10 +57,6 @@ export async function generateSummary() {
 }
 
 export async function getLatestSummary() {
-  const summary = await db
-    .select()
-    .from(summaries)
-    .orderBy(desc(summaries.generatedAt))
-    .get();
+  const summary = await db.summaries.orderBy("generatedAt").last();
   return summary ? summary.summary : null;
 }
