@@ -16,8 +16,8 @@ export async function POST(request: Request) {
   const result = streamText({
     model,
     prompt: `You are a compassionate psychologist. Respond to the following message empathetically and provide thoughtful insights:\n${message}`,
-    onFinish: async (text) => {
-      await saveChat(`${message}\nAI: ${text}`);
+    onFinish: async (result) => {
+      await saveChat(`${message}\nAI: ${result.text}`);
     },
   });
 

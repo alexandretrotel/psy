@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { canChatToday, getAllChats, getLatestSummary } from "@/lib/chat";
+import { ChatSelect } from "@/db/zod";
 
 export default function Home() {
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState("");
-  const [chats, setChats] = useState([]);
+  const [chats, setChats] = useState<ChatSelect[]>([]);
   const [summary, setSummary] = useState("");
   const [canChat, setCanChat] = useState(false);
   const [loading, setLoading] = useState(false);

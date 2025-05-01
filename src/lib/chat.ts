@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { chats, summaries } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { ai } from "./ai";
 import { streamText } from "ai";
 
@@ -47,9 +47,9 @@ export async function generateSummary() {
       null,
       2,
     )}`,
-    onFinish: async (text) => {
+    onFinish: async (result) => {
       await db.insert(summaries).values({
-        summary: text,
+        summary: result.text,
         generatedAt: new Date(),
       });
     },
@@ -62,7 +62,7 @@ export async function getLatestSummary() {
   const summary = await db
     .select()
     .from(summaries)
-    .orderBy(summaries.generatedAt.desc())
+    .orderBy(desc(summaries.generatedAt))
     .get();
   return summary ? summary.summary : null;
 }
