@@ -1,8 +1,8 @@
 import { db } from "@/db";
 import { chats, summaries } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { generateText } from "ai";
 import { ai } from "./ai";
+import { streamText } from "ai";
 
 // Format date as YYYY-MM-DD
 const getTodayDate = () => new Date().toISOString().split("T")[0];
@@ -14,6 +14,7 @@ export async function canChatToday() {
     .from(chats)
     .where(eq(chats.date, today))
     .get();
+
   return !existingChat;
 }
 
@@ -39,21 +40,22 @@ export async function generateSummary() {
     content: chat.content,
   }));
 
-  const { text } = await generateText({
+  const result = streamText({
     model: ai("chat"),
     prompt: `Summarize the following chat history in a concise and insightful way, capturing key themes and emotions:\n${JSON.stringify(
       chatContents,
       null,
       2,
     )}`,
+    onFinish: async (text) => {
+      await db.insert(summaries).values({
+        summary: text,
+        generatedAt: new Date(),
+      });
+    },
   });
 
-  await db.insert(summaries).values({
-    summary: text,
-    generatedAt: new Date(),
-  });
-
-  return text;
+  return result.toDataStreamResponse();
 }
 
 export async function getLatestSummary() {
