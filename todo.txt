@@ -1,4 +1,3 @@
-- daily chat should not be a restriction but one chat = one day (but no limit on chat and messages)
 - local data (maybe shouldn't use drizzle, needs to stay on computer, nextjs will run on vercel but the data should be on the user computer)
 - check UI and front end logic
 - import logic

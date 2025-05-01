@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { chats, summaries } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
-import { ai, model } from "./ai";
+import { model } from "./ai";
 import { streamText } from "ai";
 
 // Format date as YYYY-MM-DD
