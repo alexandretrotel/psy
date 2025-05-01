@@ -22,5 +22,5 @@ export default function SummaryPage() {
     );
   }
 
-  return <SummaryView summary={summary} onSummaryUpdated={setSummary} />;
+  return <SummaryView oldSummary={summary} onSummaryUpdated={setSummary} />;
 }

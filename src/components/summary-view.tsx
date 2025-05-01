@@ -2,53 +2,38 @@
 
 import { Button } from "@/components/ui/button";
 import { useChatStore } from "@/stores/chat.store";
-import { getAllChats, saveSummary } from "@/lib/chat";
+import { saveSummary } from "@/lib/chat";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
+import { useCompletion } from "@ai-sdk/react";
+import { useChats } from "@/hooks/use-chats";
 
 interface SummaryViewProps {
-  summary: string;
+  oldSummary: string;
   onSummaryUpdated: (newSummary: string) => void;
 }
 
-export function SummaryView({ summary, onSummaryUpdated }: SummaryViewProps) {
+export function SummaryView({
+  oldSummary,
+  onSummaryUpdated,
+}: SummaryViewProps) {
   const { loading, setLoading } = useChatStore();
+  const { chats } = useChats();
 
-  const handleGenerateSummary = async () => {
-    setLoading(true);
-    try {
-      const allChats = await getAllChats();
-      const res = await fetch("/api/summary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chatHistory: allChats }),
-      });
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-
-      let summaryText = "";
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          summaryText += decoder.decode(value);
-        }
-      }
-
-      await saveSummary(summaryText);
-      onSummaryUpdated(summaryText);
-
+  const { complete, completion } = useCompletion({
+    api: "/api/summary",
+    body: { chatHistory: chats },
+    onFinish: async (prompt, completion) => {
+      setLoading(false);
+      await saveSummary(completion);
+      onSummaryUpdated(completion);
       toast.success("Summary generated!");
-    } catch (error) {
+    },
+    onError: (error) => {
+      setLoading(false);
       toast.error(error instanceof Error ? error.message : "An error occurred");
-    }
-    setLoading(false);
-  };
+    },
+  });
 
   return (
     <>
@@ -58,12 +43,23 @@ export function SummaryView({ summary, onSummaryUpdated }: SummaryViewProps) {
 
       <div className="flex-1 px-4 pb-4">
         <div>
-          <Button onClick={handleGenerateSummary} disabled={loading}>
+          <Button
+            onClick={async () => {
+              setLoading(true);
+              await complete("");
+            }}
+            disabled={loading}
+          >
             {loading && <Loader2Icon className="h-4 w-4 animate-spin" />}
             {loading ? "Generating..." : "Generate Summary"}
           </Button>
 
-          <p className="text-muted-foreground mt-4">{summary}</p>
+          {!completion && oldSummary && (
+            <p className="text-muted-foreground mt-4">{oldSummary}</p>
+          )}
+          {completion.trim() !== "" && (
+            <p className="text-muted-foreground mt-4">{completion}</p>
+          )}
         </div>
       </div>
     </>
