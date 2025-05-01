@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { exportData, importData } from "@/lib/chat";
 import { useChatStore } from "@/stores/chat.store";
 import { saveAs } from "file-saver";
-import { motion } from "motion/react";
 import { toast } from "sonner";
 
 interface ExportImportControlsProps {
@@ -67,12 +66,7 @@ export function ExportImportControls({
   };
 
   return (
-    <motion.div
-      className="flex gap-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div className="flex gap-4">
       <Button size="sm" onClick={handleExport} disabled={loading}>
         Export Data
       </Button>
@@ -96,6 +90,6 @@ export function ExportImportControls({
           disabled={loading}
         />
       </div>
-    </motion.div>
+    </div>
   );
 }

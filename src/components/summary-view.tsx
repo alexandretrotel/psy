@@ -1,11 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useChatStore } from "@/stores/chat.store";
 import { getAllChats, saveSummary } from "@/lib/chat";
-import { motion } from "motion/react";
 import { toast } from "sonner";
+import { Loader2Icon } from "lucide-react";
 
 interface SummaryViewProps {
   summary: string;
@@ -52,24 +51,21 @@ export function SummaryView({ summary, onSummaryUpdated }: SummaryViewProps) {
   };
 
   return (
-    <Card className="flex-1">
-      <CardHeader>
-        <CardTitle>Summary of All Chats</CardTitle>
-      </CardHeader>
+    <>
+      <header className="flex items-center justify-between border-b p-4">
+        <h1 className="text-foreground text-xl font-bold">Summary</h1>
+      </header>
 
-      <CardContent>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+      <div className="flex-1 px-4 pb-4">
+        <div>
           <Button onClick={handleGenerateSummary} disabled={loading}>
+            {loading && <Loader2Icon className="h-4 w-4 animate-spin" />}
             {loading ? "Generating..." : "Generate Summary"}
           </Button>
 
           <p className="text-muted-foreground mt-4">{summary}</p>
-        </motion.div>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </>
   );
 }

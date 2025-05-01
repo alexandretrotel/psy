@@ -27,5 +27,5 @@ export const useChats = () => {
     fetchChats();
   }, []);
 
-  return { chats, loading, error, fetchChats };
+  return { chats, setChats, loading, error, fetchChats };
 };

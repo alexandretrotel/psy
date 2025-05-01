@@ -1,15 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useChatStore } from "@/stores/chat.store";
 import { addMessageToChat, getAllChats } from "@/lib/chat";
-import { motion } from "motion/react";
 import { toast } from "sonner";
 import { useChats } from "@/hooks/use-chats";
+import { Loader2Icon } from "lucide-react";
 
 interface ChatViewProps {
   onChatsUpdated: () => void;
@@ -32,7 +31,9 @@ export function ChatView({ onChatsUpdated }: ChatViewProps) {
     }
   }, [chat?.messages]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (!message) return;
 
     setLoading(true);
@@ -74,69 +75,54 @@ export function ChatView({ onChatsUpdated }: ChatViewProps) {
   };
 
   return (
-    <Card className="flex h-full flex-1 flex-col">
-      <CardHeader>
-        <CardTitle>{chat ? `Chat - ${chat.date}` : "Select a Chat"}</CardTitle>
-      </CardHeader>
+    <div className="flex h-full flex-1 flex-col">
+      <ScrollArea className="flex-1" ref={scrollAreaRef}>
+        {chat && chat.messages.length > 0 ? (
+          <ul className="space-y-4">
+            {chat.messages.map((msg, idx) => (
+              <li key={idx}>
+                <div className="mb-2">
+                  <strong className="text-primary">You:</strong> {msg.user}
+                </div>
 
-      <CardContent className="flex flex-1 flex-col gap-4">
-        <ScrollArea className="flex-1" ref={scrollAreaRef}>
-          {chat && chat.messages.length > 0 ? (
-            <ul className="space-y-4 p-4">
-              {chat.messages.map((msg, idx) => (
-                <motion.li
-                  key={idx}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="mb-2">
-                    <strong className="text-primary">You:</strong> {msg.user}
-                  </div>
+                <div className="text-muted-foreground">
+                  <strong>AI:</strong> {msg.ai}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground p-4">
+            {chat ? "No messages yet." : "Please select a chat."}
+          </p>
+        )}
+      </ScrollArea>
 
-                  <div className="text-muted-foreground">
-                    <strong>AI:</strong> {msg.ai}
-                  </div>
-                </motion.li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-muted-foreground p-4">
-              {chat ? "No messages yet." : "Please select a chat."}
-            </p>
-          )}
-        </ScrollArea>
-
-        <div className="flex gap-2">
+      <form className="flex flex-col" onSubmit={handleSubmit}>
+        <div className="relative w-full">
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Share your thoughts..."
-            className="flex-1"
+            className="h-28 pr-20"
             disabled={loading || !chat}
           />
-
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button
-              onClick={handleSubmit}
-              disabled={!message || loading || !chat}
-            >
-              {loading ? "Sending..." : "Send"}
-            </Button>
-          </motion.div>
-        </div>
-
-        {response && (
-          <motion.div
-            className="text-muted-foreground mt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
+          <Button
+            type="submit"
+            disabled={!message || loading || !chat}
+            className="absolute right-2 bottom-2"
           >
-            <strong>AI (Preview):</strong> {response}
-          </motion.div>
-        )}
-      </CardContent>
-    </Card>
+            {loading && <Loader2Icon className="h-4 w-4 animate-spin" />}
+            {loading ? "Sending..." : "Send"}
+          </Button>
+        </div>
+      </form>
+
+      {response && (
+        <div className="text-muted-foreground mt-4">
+          <strong>AI (Preview):</strong> {response}
+        </div>
+      )}
+    </div>
   );
 }
