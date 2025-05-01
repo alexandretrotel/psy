@@ -1,3 +1,2 @@
-- check UI and front end logic
-- polish UI (motion animation)
+- check UI and front end logic, refactor
 - use dexie hook (useLiveQuery)
