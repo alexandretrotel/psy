@@ -33,7 +33,7 @@ export async function getAllChats() {
 
 export async function generateSummary() {
   const allChats = await getAllChats();
-  if (allChats.length === 0) return "No chats to summarize.";
+  if (allChats.length === 0) return Response.json("No chats to summarize.");
 
   const chatContents = allChats.map((chat) => ({
     date: chat.date,

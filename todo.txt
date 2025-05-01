@@ -3,3 +3,4 @@
 - import logic
 - polish UI (motion animation)
 - use zustand where necessary
+- work on AI memory, etc
