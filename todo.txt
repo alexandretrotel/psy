@@ -1,4 +1,5 @@
 - add save chat and daily chat logic tweak
+- local data (maybe shouldn't use drizzle, needs to stay on computer, nextjs will run on vercel but the data should be on the user computer)
 - check UI and front end logic
 - import logic
 - polish UI (motion animation)
