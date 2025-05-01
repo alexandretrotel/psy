@@ -17,7 +17,7 @@ export default function Home() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
-  const { canChat } = useStore();
+  const { canChat } = useChatStore();
 
   useEffect(() => {
     async function init() {
