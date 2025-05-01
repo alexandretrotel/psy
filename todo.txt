@@ -1,2 +1,5 @@
 - add save chat and daily chat logic tweak
 - check UI and front end logic
+- import logic
+- polish UI (motion animation)
+- use zustand where necessary
