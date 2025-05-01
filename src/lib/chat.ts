@@ -1,30 +1,43 @@
 import { db } from "@/db";
 import { chats, summaries } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
-import { ai } from "./ai";
+import { ai, model } from "./ai";
 import { streamText } from "ai";
 
 // Format date as YYYY-MM-DD
 const getTodayDate = () => new Date().toISOString().split("T")[0];
 
-export async function canChatToday() {
+export async function getOrCreateTodayChat() {
   const today = getTodayDate();
-  const existingChat = await db
-    .select()
-    .from(chats)
-    .where(eq(chats.date, today))
-    .get();
 
-  return !existingChat;
+  let chat = await db.select().from(chats).where(eq(chats.date, today)).get();
+  if (!chat) {
+    await db.insert(chats).values({
+      date: today,
+      messages: JSON.stringify([]),
+      createdAt: new Date(),
+    });
+
+    chat = await db.select().from(chats).where(eq(chats.date, today)).get();
+  }
+
+  return chat;
 }
 
-export async function saveChat(content: string) {
+export async function addMessageToChat(message: string, aiResponse: string) {
   const today = getTodayDate();
-  await db.insert(chats).values({
-    date: today,
-    content,
-    createdAt: new Date(),
-  });
+  const chat = await getOrCreateTodayChat();
+  const messages = JSON.parse(chat?.messages || "[]") as Array<{
+    user: string;
+    ai: string;
+  }>;
+
+  messages.push({ user: message, ai: aiResponse });
+
+  await db
+    .update(chats)
+    .set({ messages: JSON.stringify(messages) })
+    .where(eq(chats.date, today));
 }
 
 export async function getAllChats() {
@@ -33,15 +46,17 @@ export async function getAllChats() {
 
 export async function generateSummary() {
   const allChats = await getAllChats();
-  if (allChats.length === 0) return Response.json("No chats to summarize.");
+  if (allChats.length === 0) {
+    return Response.json("No chats to summarize.");
+  }
 
   const chatContents = allChats.map((chat) => ({
     date: chat.date,
-    content: chat.content,
+    messages: JSON.parse(chat.messages as string),
   }));
 
   const result = streamText({
-    model: ai("chat"),
+    model,
     prompt: `Summarize the following chat history in a concise and insightful way, capturing key themes and emotions:\n${JSON.stringify(
       chatContents,
       null,
