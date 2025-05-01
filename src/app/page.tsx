@@ -11,7 +11,6 @@ import {
 } from "@/lib/chat";
 import { Chat } from "@/lib/db";
 import { Input } from "@/components/ui/input";
-import { motion } from "motion/react";
 
 export default function Home() {
   const [message, setMessage] = useState("");
@@ -144,7 +143,7 @@ export default function Home() {
           Export Database
         </a>
       </Button>
-      <motion.div
+      <div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -170,7 +169,7 @@ export default function Home() {
           <Input type="file" name="file" accept=".json" className="mb-2" />
           <Button type="submit">Import Database</Button>
         </form>
-      </motion.div>
+      </div>
     </div>
   );
 }
