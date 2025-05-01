@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Chat } from "@/lib/db";
 import { useChatStore } from "@/stores/chat.store";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { BotMessageSquareIcon } from "lucide-react";
 
 interface ChatSidebarProps {
   chats: Chat[];
@@ -45,7 +46,10 @@ export function ChatSidebar({ chats }: ChatSidebarProps) {
                 className="w-full justify-start"
                 asChild
               >
-                <Link href="/summary">Summary</Link>
+                <Link href="/summary">
+                  <BotMessageSquareIcon className="h-4 w-4" />
+                  Summary
+                </Link>
               </Button>
             </li>
 

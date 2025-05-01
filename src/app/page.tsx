@@ -2,6 +2,7 @@
 
 import { ChatView } from "@/components/chat-view";
 import { Controls } from "@/components/controls";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useChats } from "@/hooks/use-chats";
 import { useSummary } from "@/hooks/use-summary";
 
@@ -17,7 +18,11 @@ export default function Home() {
   return (
     <>
       <header className="flex items-center justify-between border-b p-4">
-        <h1 className="text-foreground text-xl font-bold">Psychologist</h1>
+        <div className="flex items-center gap-4">
+          <SidebarTrigger />
+          <h1 className="text-foreground text-xl font-bold">Welcome</h1>
+        </div>
+
         <Controls onDataImported={fetchData} />
       </header>
 

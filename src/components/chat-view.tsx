@@ -1,22 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useChatStore } from "@/stores/chat.store";
 import { addMessageToChat } from "@/lib/chat";
 import { toast } from "sonner";
 import { useChats } from "@/hooks/use-chats";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, Send } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
+import { Markdown } from "./wrappers/markdown";
+import { cn } from "@/lib/utils";
 
 interface ChatViewProps {
   onChatsUpdated: () => void;
 }
 
 export function ChatView({ onChatsUpdated }: ChatViewProps) {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { chats } = useChats();
   const { selectedChatId } = useChatStore();
@@ -37,63 +38,78 @@ export function ChatView({ onChatsUpdated }: ChatViewProps) {
   const chat = chats.find((chat) => chat.id === selectedChatId) || null;
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    }
-  }, [chat?.messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
-    <div className="flex h-full flex-1 flex-col">
-      <ScrollArea className="flex-1" ref={scrollAreaRef}>
-        {messages.length > 0 ? (
-          <ul className="space-y-4">
-            {messages.map((msg, idx) => {
-              if (msg.role === "user") {
-                return (
-                  <li key={idx}>
-                    <div className="text-muted-foreground">
-                      <strong>You:</strong> {msg.content}
-                    </div>
-                  </li>
-                );
-              }
-
-              return (
-                <li key={idx}>
-                  <div className="text-muted-foreground">
-                    <strong>AI:</strong> {msg.content}
+    <div className="flex h-full flex-1 flex-col gap-4 p-4">
+      <div className="bg-background/50 flex-1 overflow-y-auto">
+        <div className="p-4">
+          {messages.length > 0 ? (
+            <ul className="space-y-4">
+              {messages.map((msg, idx) => (
+                <li
+                  key={idx}
+                  className={cn(
+                    "flex w-full",
+                    msg.role === "user" ? "justify-end" : "justify-start",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "max-w-[80%] rounded-lg",
+                      msg.role === "user"
+                        ? "bg-muted text-foreground p-3"
+                        : "text-foreground bg-transparent",
+                    )}
+                  >
+                    {msg.role === "user" ? (
+                      <div className="text-sm">{msg.content}</div>
+                    ) : (
+                      <Markdown text={msg.content} />
+                    )}
                   </div>
                 </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="text-muted-foreground">
-            {chat ? "No messages yet." : "Please select a chat."}
-          </p>
-        )}
-      </ScrollArea>
-
-      <form className="flex flex-col" onSubmit={handleSubmit}>
-        <div className="relative w-full">
-          <Textarea
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Share your thoughts..."
-            className="h-28 pr-20"
-            disabled={status === "streaming" || !chat}
-          />
-          <Button
-            type="submit"
-            disabled={!input || status === "streaming" || !chat}
-            className="absolute right-2 bottom-2"
-          >
-            {status === "streaming" && (
-              <Loader2Icon className="h-4 w-4 animate-spin" />
-            )}
-            {status === "streaming" ? "Sending..." : "Send"}
-          </Button>
+              ))}
+              <div ref={messagesEndRef} />
+            </ul>
+          ) : (
+            <div className="text-muted-foreground flex h-full items-center justify-center">
+              {chat ? "Start the conversation!" : "Please select a chat."}
+            </div>
+          )}
         </div>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="bg-muted flex items-end gap-2 rounded-md border p-2"
+      >
+        <Textarea
+          value={input}
+          onChange={handleInputChange}
+          placeholder="Type your message..."
+          className="min-h-[48px] flex-1 resize-none border-none bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent"
+          disabled={status === "streaming" || !chat}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e);
+            }
+          }}
+        />
+        <Button
+          type="submit"
+          disabled={!input || status === "streaming" || !chat}
+          size="icon"
+          className="shrink-0"
+        >
+          {status === "streaming" ? (
+            <Loader2Icon className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
+        </Button>
       </form>
     </div>
   );
