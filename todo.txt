@@ -1,5 +1,3 @@
 - check UI and front end logic
-- import logic
 - polish UI (motion animation)
-- use zustand where necessary
-- work on AI memory, etc
+- use dexie hook (useLiveQuery)

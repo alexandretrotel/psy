@@ -10,6 +10,8 @@ import {
   getLatestSummary,
 } from "@/lib/chat";
 import { Chat } from "@/lib/db";
+import { Input } from "@/components/ui/input";
+import { motion } from "motion/react";
 
 export default function Home() {
   const [message, setMessage] = useState("");
@@ -17,7 +19,6 @@ export default function Home() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
-  const { canChat } = useChatStore();
 
   useEffect(() => {
     async function init() {
@@ -143,6 +144,33 @@ export default function Home() {
           Export Database
         </a>
       </Button>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="mt-4"
+      >
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const res = await fetch("/api/import", {
+              method: "POST",
+              body: formData,
+            });
+            if (res.ok) {
+              setChats(await getAllChats());
+              setSummary((await getLatestSummary()) || "No summary yet.");
+              alert("Data imported successfully!");
+            } else {
+              alert("Failed to import data.");
+            }
+          }}
+        >
+          <Input type="file" name="file" accept=".json" className="mb-2" />
+          <Button type="submit">Import Database</Button>
+        </form>
+      </motion.div>
     </div>
   );
 }
