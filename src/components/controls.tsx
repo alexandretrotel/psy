@@ -11,9 +11,7 @@ interface ExportImportControlsProps {
   onDataImported: () => void;
 }
 
-export function ExportImportControls({
-  onDataImported,
-}: ExportImportControlsProps) {
+export function Controls({ onDataImported }: ExportImportControlsProps) {
   const { loading, setLoading } = useChatStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 

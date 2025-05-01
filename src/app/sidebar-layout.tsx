@@ -4,6 +4,7 @@ import { ChatSidebar } from "@/components/chat-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useChats } from "@/hooks/use-chats";
 import { getOrCreateTodayChat } from "@/lib/chat";
+import { useChatStore } from "@/stores/chat.store";
 import { useCallback, useEffect } from "react";
 
 export default function SidebarLayout({
@@ -12,11 +13,13 @@ export default function SidebarLayout({
   children: React.ReactNode;
 }) {
   const { chats, setChats } = useChats();
+  const { setSelectedChatId } = useChatStore();
 
   const createTodayChat = useCallback(async () => {
     const chat = await getOrCreateTodayChat();
     setChats([chat]);
-  }, [setChats]);
+    setSelectedChatId(chat.id!);
+  }, [setChats, setSelectedChatId]);
 
   useEffect(() => {
     if (chats.length === 0) {

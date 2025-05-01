@@ -92,7 +92,7 @@ export function ChatView({ onChatsUpdated }: ChatViewProps) {
             ))}
           </ul>
         ) : (
-          <p className="text-muted-foreground p-4">
+          <p className="text-muted-foreground">
             {chat ? "No messages yet." : "Please select a chat."}
           </p>
         )}
