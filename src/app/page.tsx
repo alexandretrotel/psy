@@ -29,22 +29,24 @@ export default function Home() {
 
   return (
     <div className="flex h-screen flex-col">
-      <motion.header
-        className="border-b p-4"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-2xl font-bold">Psychologist</h1>
-      </motion.header>
-
       <div className="flex flex-1 overflow-hidden">
         <ChatSidebar chats={chats} />
 
-        <main className="flex flex-1 flex-col gap-4 p-4">
-          <ChatView chat={selectedChat} onChatsUpdated={fetchData} />
-          <SummaryView summary={summary} onSummaryUpdated={setSummary} />
-          <ExportImportControls onDataImported={fetchData} />
+        <main className="flex flex-1 flex-col gap-4">
+          <motion.header
+            className="flex items-center justify-between border-b p-4"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-foreground text-xl font-bold">Psychologist</h1>
+            <ExportImportControls onDataImported={fetchData} />
+          </motion.header>
+
+          <div className="flex-1 p-4">
+            <ChatView chat={selectedChat} onChatsUpdated={fetchData} />
+            <SummaryView summary={summary} onSummaryUpdated={setSummary} />
+          </div>
         </main>
       </div>
     </div>

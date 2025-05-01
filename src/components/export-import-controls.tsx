@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { exportData, importData } from "@/lib/chat";
 import { useChatStore } from "@/stores/chat.store";
 import { saveAs } from "file-saver";
@@ -18,6 +17,12 @@ export function ExportImportControls({
 }: ExportImportControlsProps) {
   const { loading, setLoading } = useChatStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const triggerFileSelect = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   const handleExport = async () => {
     setLoading(true);
@@ -68,18 +73,29 @@ export function ExportImportControls({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <Button onClick={handleExport} disabled={loading}>
+      <Button size="sm" onClick={handleExport} disabled={loading}>
         Export Data
       </Button>
 
-      <Input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleImport}
-        accept=".json"
-        className="w-auto"
-        disabled={loading}
-      />
+      <div className="relative">
+        <Button
+          size="sm"
+          variant="secondary"
+          disabled={loading}
+          onClick={triggerFileSelect}
+        >
+          Import Data
+        </Button>
+        <input
+          id="file-input"
+          type="file"
+          ref={fileInputRef}
+          onChange={handleImport}
+          accept=".json"
+          className="hidden"
+          disabled={loading}
+        />
+      </div>
     </motion.div>
   );
 }
