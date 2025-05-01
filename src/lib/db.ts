@@ -1,14 +1,10 @@
+import { UIMessage } from "ai";
 import Dexie, { type EntityTable } from "dexie";
-
-type Message = {
-  user: string;
-  ai: string;
-};
 
 interface Chat {
   id?: number;
   date: string; // YYYY-MM-DD
-  messages: Message[];
+  messages: UIMessage[];
   createdAt: Date;
 }
 
@@ -28,5 +24,5 @@ db.version(1).stores({
   summaries: "++id, summary, generatedAt",
 });
 
-export type { Chat, Summary, Message };
+export type { Chat, Summary };
 export { db };

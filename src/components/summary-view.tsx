@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useChatStore } from "@/stores/chat.store";
 import { saveSummary } from "@/lib/chat";
 import { toast } from "sonner";
 import { Loader2Icon } from "lucide-react";
@@ -17,20 +16,17 @@ export function SummaryView({
   oldSummary,
   onSummaryUpdated,
 }: SummaryViewProps) {
-  const { loading, setLoading } = useChatStore();
   const { chats } = useChats();
 
-  const { complete, completion } = useCompletion({
+  const { complete, completion, isLoading } = useCompletion({
     api: "/api/summary",
     body: { chatHistory: chats },
     onFinish: async (prompt, completion) => {
-      setLoading(false);
       await saveSummary(completion);
       onSummaryUpdated(completion);
       toast.success("Summary generated!");
     },
     onError: (error) => {
-      setLoading(false);
       toast.error(error instanceof Error ? error.message : "An error occurred");
     },
   });
@@ -45,13 +41,12 @@ export function SummaryView({
         <div>
           <Button
             onClick={async () => {
-              setLoading(true);
               await complete("");
             }}
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading && <Loader2Icon className="h-4 w-4 animate-spin" />}
-            {loading ? "Generating..." : "Generate Summary"}
+            {isLoading && <Loader2Icon className="h-4 w-4 animate-spin" />}
+            {isLoading ? "Generating..." : "Generate Summary"}
           </Button>
 
           {!completion && oldSummary && (

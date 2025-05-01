@@ -1,4 +1,6 @@
+import { UIMessage } from "ai";
 import { Chat, db, Summary } from "./db";
+import { v4 as uuidv4 } from "uuid";
 
 // Format date as YYYY-MM-DD
 const getTodayDate = () => new Date().toISOString().split("T")[0];
@@ -16,8 +18,19 @@ export async function getOrCreateTodayChat() {
 
 export async function addMessageToChat(message: string, aiResponse: string) {
   const chat = await getOrCreateTodayChat();
-  const messages = chat.messages;
-  messages.push({ user: message, ai: aiResponse });
+  const messages: UIMessage[] = chat.messages;
+  messages.push({
+    role: "user",
+    content: message,
+    id: uuidv4(),
+    parts: [],
+  });
+  messages.push({
+    role: "assistant",
+    content: aiResponse,
+    id: uuidv4(),
+    parts: [],
+  });
   await db.chats.update(chat.id!, { messages });
   return chat;
 }
