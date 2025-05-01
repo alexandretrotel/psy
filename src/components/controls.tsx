@@ -1,9 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { exportData, importData } from "@/lib/chat";
-import { useChatStore } from "@/stores/chat.store";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 
@@ -12,7 +11,7 @@ interface ExportImportControlsProps {
 }
 
 export function Controls({ onDataImported }: ExportImportControlsProps) {
-  const { loading, setLoading } = useChatStore();
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const triggerFileSelect = () => {
