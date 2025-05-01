@@ -1,11 +1,18 @@
-import { readFileSync } from "fs";
+import { db } from "@/lib/db";
 
 export async function GET() {
-  const dbBuffer = readFileSync("./sqlite.db");
-  return new Response(dbBuffer, {
+  const chats = await db.chats.toArray();
+  const summaries = await db.summaries.toArray();
+  const data = { chats, summaries };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json",
+  });
+
+  return new Response(blob, {
     headers: {
-      "Content-Type": "application/octet-stream",
-      "Content-Disposition": "attachment; filename=psy.db",
+      "Content-Type": "application/json",
+      "Content-Disposition": "attachment; filename=psychologue.json",
     },
   });
 }

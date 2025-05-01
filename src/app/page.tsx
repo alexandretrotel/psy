@@ -4,20 +4,24 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { canChatToday, getAllChats, getLatestSummary } from "@/lib/chat";
-import { ChatSelect } from "@/db/zod";
+import {
+  getOrCreateTodayChat,
+  getAllChats,
+  getLatestSummary,
+} from "@/lib/chat";
+import { Chat } from "@/lib/db";
 
 export default function Home() {
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState("");
-  const [chats, setChats] = useState<ChatSelect[]>([]);
+  const [chats, setChats] = useState<Chat[]>([]);
   const [summary, setSummary] = useState("");
-  const [canChat, setCanChat] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { canChat } = useStore();
 
   useEffect(() => {
     async function init() {
-      setCanChat(await canChatToday());
+      await getOrCreateTodayChat();
       setChats(await getAllChats());
       setSummary((await getLatestSummary()) || "No summary yet.");
     }
@@ -25,32 +29,43 @@ export default function Home() {
   }, []);
 
   const handleSubmit = async () => {
-    if (!canChat) {
-      alert("You've already chatted today!");
-      return;
-    }
+    if (!message) return;
     setLoading(true);
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message }),
     });
-    const data = await res.json();
-    if (data.error) {
-      alert(data.error);
-    } else {
-      setResponse(data.response);
-      setChats(await getAllChats());
-      setCanChat(false);
+    const reader = res.body?.getReader();
+    const decoder = new TextDecoder();
+    let aiResponse = "";
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        aiResponse += decoder.decode(value);
+        setResponse(aiResponse);
+      }
     }
+    setChats(await getAllChats());
+    setMessage("");
     setLoading(false);
   };
 
   const handleGenerateSummary = async () => {
     setLoading(true);
     const res = await fetch("/api/summary");
-    const { summary } = await res.json();
-    setSummary(summary);
+    const reader = res.body?.getReader();
+    const decoder = new TextDecoder();
+    let summaryText = "";
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        summaryText += decoder.decode(value);
+        setSummary(summaryText);
+      }
+    }
     setLoading(false);
   };
 
@@ -68,12 +83,9 @@ export default function Home() {
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Share your thoughts..."
               className="mb-4"
-              disabled={!canChat || loading}
+              disabled={loading}
             />
-            <Button
-              onClick={handleSubmit}
-              disabled={!canChat || !message || loading}
-            >
+            <Button onClick={handleSubmit} disabled={!message || loading}>
               {loading ? "Processing..." : "Submit"}
             </Button>
             {response && (
@@ -92,10 +104,22 @@ export default function Home() {
             {chats.length === 0 ? (
               <p>No chats yet.</p>
             ) : (
-              <ul className="space-y-2">
+              <ul className="space-y-4">
                 {chats.map((chat) => (
                   <li key={chat.id}>
-                    <strong>{chat.date}:</strong> {chat.content}
+                    <strong>{chat.date}:</strong>
+                    <ul className="ml-4 space-y-2">
+                      {chat.messages.map((msg, idx) => (
+                        <li key={idx}>
+                          <p>
+                            <strong>You:</strong> {msg.user}
+                          </p>
+                          <p>
+                            <strong>AI:</strong> {msg.ai}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
                   </li>
                 ))}
               </ul>
