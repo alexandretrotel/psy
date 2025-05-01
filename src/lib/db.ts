@@ -1,29 +1,27 @@
-import Dexie, { Table } from "dexie";
+import Dexie, { type EntityTable } from "dexie";
 
-export interface Chat {
+interface Chat {
   id?: number;
   date: string; // YYYY-MM-DD
   messages: { user: string; ai: string }[];
   createdAt: Date;
 }
 
-export interface Summary {
+interface Summary {
   id?: number;
   summary: string;
   generatedAt: Date;
 }
 
-class PsyDB extends Dexie {
-  chats!: Table<Chat>;
-  summaries!: Table<Summary>;
+const db = new Dexie("PsyDB") as Dexie & {
+  chats: EntityTable<Chat, "id">;
+  summaries: EntityTable<Summary, "id">;
+};
 
-  constructor() {
-    super("PsyDB");
-    this.version(1).stores({
-      chats: "++id,date,messages,createdAt",
-      summaries: "++id,summary,generatedAt",
-    });
-  }
-}
+db.version(1).stores({
+  chats: "++id, date, messages, createdAt",
+  summaries: "++id, summary, generatedAt",
+});
 
-export const db = new PsyDB();
+export type { Chat, Summary };
+export { db };
