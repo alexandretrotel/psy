@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/providers/theme.provider";
 import { Toaster } from "@/components/ui/sonner";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import SidebarLayout from "./sidebar-layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,8 +37,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>{children}</SidebarProvider>
-
+          <SidebarLayout>{children}</SidebarLayout>
           <Toaster />
         </ThemeProvider>
       </body>

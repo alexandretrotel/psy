@@ -5,22 +5,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Chat } from "@/lib/db";
 import { useChatStore } from "@/stores/chat.store";
 import { addMessageToChat, getAllChats } from "@/lib/chat";
 import { motion } from "motion/react";
 import { toast } from "sonner";
+import { useChats } from "@/hooks/use-chats";
 
 interface ChatViewProps {
-  chat: Chat | null;
   onChatsUpdated: () => void;
 }
 
-export function ChatView({ chat, onChatsUpdated }: ChatViewProps) {
+export function ChatView({ onChatsUpdated }: ChatViewProps) {
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState("");
   const { loading, setLoading } = useChatStore();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const { selectedChatId } = useChatStore();
+  const { chats } = useChats();
+
+  const chat = chats.find((chat) => chat.id === selectedChatId) || null;
 
   useEffect(() => {
     if (scrollAreaRef.current) {
