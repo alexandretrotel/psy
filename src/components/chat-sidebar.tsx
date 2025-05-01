@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Chat } from "@/lib/db";
 import { useChatStore } from "@/stores/chat.store";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 interface ChatSidebarProps {
   chats: Chat[];
@@ -29,7 +30,10 @@ export function ChatSidebar({ chats }: ChatSidebarProps) {
   return (
     <Sidebar className="w-64 border-r">
       <ScrollArea className="h-full p-4">
-        <h2 className="mb-4 text-lg font-semibold">Chat History</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Chat History</h2>
+          <ModeToggle />
+        </div>
 
         {chats.length === 0 ? (
           <p className="text-muted-foreground">No chats yet.</p>

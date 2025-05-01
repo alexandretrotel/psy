@@ -2,14 +2,14 @@ import { UIMessage } from "ai";
 import Dexie, { type EntityTable } from "dexie";
 
 interface Chat {
-  id?: number;
+  id?: string;
   date: string; // YYYY-MM-DD
   messages: UIMessage[];
   createdAt: Date;
 }
 
 interface Summary {
-  id?: number;
+  id?: string;
   summary: string;
   generatedAt: Date;
 }

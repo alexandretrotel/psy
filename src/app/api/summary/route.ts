@@ -15,11 +15,14 @@ export async function POST(request: Request) {
 
   const result = streamText({
     model,
-    prompt: `Summarize the following chat history in a concise and insightful way, capturing key themes and emotions:\n${JSON.stringify(
+    prompt: `From the following chat history summarize concisely the state of mind of the user, highlighting key emotional themes, recurring concerns, and insights. Keep the summary brief and empathetic:\n${JSON.stringify(
       chatContents,
       null,
       2,
     )}`,
+    temperature: 0.8, // Slightly higher for nuanced insights
+    maxTokens: 150, // Short, focused summaries
+    topP: 0.85, // Slightly more focused than chat route
   });
 
   return result.toDataStreamResponse();
