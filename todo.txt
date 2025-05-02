@@ -1,2 +1,2 @@
-- refactor UI
+- refactor UI and code
 - support prompt summary (get a specific insights from all discussion)
