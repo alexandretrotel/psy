@@ -3,7 +3,7 @@ import { Chat, db, Summary } from "./db";
 import { v4 as uuidv4 } from "uuid";
 
 // Format date as YYYY-MM-DD
-const getTodayDate = () => new Date().toISOString().split("T")[0];
+export const getTodayDate = () => new Date().toISOString().split("T")[0];
 
 export async function getOrCreateTodayChat() {
   const today = getTodayDate();
@@ -65,4 +65,8 @@ export async function importData(data: {
   await db.summaries.clear();
   await db.chats.bulkAdd(data.chats);
   await db.summaries.bulkAdd(data.summaries);
+}
+
+export function getIsTodayChat(chat: Chat) {
+  return chat.date === getTodayDate();
 }

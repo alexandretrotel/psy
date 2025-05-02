@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useChatStore } from "@/stores/chat.store";
-import { addMessageToChat } from "@/lib/chat";
+import { addMessageToChat, getIsTodayChat } from "@/lib/chat";
 import { toast } from "sonner";
 import { useChats } from "@/hooks/use-chats";
 import { Loader2Icon, Send } from "lucide-react";
@@ -36,11 +36,21 @@ export function ChatView({ onChatsUpdated }: ChatViewProps) {
     },
   });
 
-  const chat = chats.find((chat) => chat.id === selectedChatId) || null;
-
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const chat = chats.find((chat) => chat.id === selectedChatId) || null;
+
+  if (!chat) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        Please select a chat.
+      </div>
+    );
+  }
+
+  const isTodayChat = getIsTodayChat(chat);
 
   return (
     <div className="flex h-full flex-1 flex-col gap-4 p-4">
@@ -101,7 +111,7 @@ export function ChatView({ onChatsUpdated }: ChatViewProps) {
         />
         <Button
           type="submit"
-          disabled={!input || status === "streaming" || !chat}
+          disabled={!input || status === "streaming" || !chat || !isTodayChat}
           size="icon"
           className="shrink-0"
         >
