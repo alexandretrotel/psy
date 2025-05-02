@@ -84,7 +84,7 @@ export function ChatView({ onChatsUpdated }: ChatViewProps) {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-muted flex items-end gap-2 rounded-md border p-2"
+        className="bg-muted flex w-full items-end gap-2 rounded-md border p-2"
       >
         <Textarea
           value={input}
