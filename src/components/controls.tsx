@@ -63,7 +63,7 @@ export function Controls({ onDataImported }: ExportImportControlsProps) {
   };
 
   return (
-    <div className="flex gap-4">
+    <div className="flex w-full gap-4">
       <Button size="sm" onClick={handleExport} disabled={loading}>
         Export Data
       </Button>

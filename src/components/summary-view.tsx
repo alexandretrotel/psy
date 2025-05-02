@@ -56,12 +56,12 @@ export function SummaryView({
       <div className="flex-1 px-4 pb-4">
         <div>
           {!completion && oldSummary && (
-            <div className="text-muted-foreground mt-4">
+            <div className="text-foreground mt-4">
               <Markdown text={oldSummary} />
             </div>
           )}
           {completion.trim() !== "" && (
-            <div className="text-muted-foreground mt-4">
+            <div className="text-foreground mt-4">
               <Markdown text={completion} />
             </div>
           )}

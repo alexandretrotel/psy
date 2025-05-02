@@ -8,6 +8,7 @@ export const useChats = () => {
   const [loading, setLoading] = useState(false);
   const [chats, setChats] = useState<Chat[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [currentChat, setCurrentChat] = useState<Chat | null>(null);
 
   const fetchChats = async () => {
     setLoading(true);
@@ -27,5 +28,13 @@ export const useChats = () => {
     fetchChats();
   }, []);
 
-  return { chats, setChats, loading, error, fetchChats };
+  return {
+    chats,
+    setChats,
+    currentChat,
+    setCurrentChat,
+    loading,
+    error,
+    fetchChats,
+  };
 };

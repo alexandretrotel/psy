@@ -33,7 +33,7 @@ export default function SidebarLayout({
         <div className="flex flex-1">
           <ChatSidebar chats={chats} />
 
-          <main className="relative flex h-full max-w-full flex-1 flex-col overflow-hidden">
+          <main className="relative flex h-full max-w-full flex-1 flex-col">
             {children}
           </main>
         </div>

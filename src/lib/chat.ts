@@ -70,3 +70,10 @@ export async function importData(data: {
 export function getIsTodayChat(chat: Chat) {
   return chat.date === getTodayDate();
 }
+
+export async function clearChat(chatId: string) {
+  const chat = await db.chats.get(chatId);
+  if (chat) {
+    await db.chats.delete(chatId);
+  }
+}
