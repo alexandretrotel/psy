@@ -1,2 +1,2 @@
 - refactor UI and code
-- support prompt summary (get a specific insights from all discussion)
+- save summary with specific prompt support too (see: // TODO)
