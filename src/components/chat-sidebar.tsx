@@ -34,6 +34,11 @@ export function ChatSidebar({ chats }: ChatSidebarProps) {
   useEffect(() => {
     if (!selectedChatId && chats.length > 0) {
       setSelectedChatId(chats[0].id!);
+    } else if (
+      selectedChatId &&
+      !chats.some((chat) => chat.id === selectedChatId)
+    ) {
+      setSelectedChatId(chats[0]?.id);
     }
   }, [chats, selectedChatId, setSelectedChatId]);
 

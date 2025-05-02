@@ -1,2 +1,2 @@
-- polish UI and refactor (markdown styling, etc)
+- refactor UI
 - support prompt summary (get a specific insights from all discussion)

@@ -61,7 +61,7 @@ export function ChatView({ chat }: ChatViewProps) {
   };
 
   return (
-    <div className="relative mx-auto flex h-full max-w-4xl flex-1 flex-col gap-4">
+    <div className="relative mx-auto flex h-full max-w-4xl flex-1 flex-col">
       <ScrollArea className="bg-background/50 flex-1">
         {messages.length > 0 ? (
           <ul className="space-y-4 pb-24">

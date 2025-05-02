@@ -50,8 +50,8 @@ export default function Home() {
   };
 
   return (
-    <div className="transition-width relative h-full w-full flex-1">
-      <header className="bg-background sticky top-0 z-50 flex items-center justify-between border-b p-4">
+    <div className="transition-width relative h-screen min-h-screen w-full">
+      <header className="bg-background sticky top-0 z-50 flex h-16 items-center justify-between border-b p-4">
         <div className="flex items-center gap-4">
           <SidebarTrigger />
         </div>
@@ -61,7 +61,7 @@ export default function Home() {
         </Button>
       </header>
 
-      <div className="flex-1 p-4">
+      <div className="p-4" style={{ height: "calc(100vh - 64px)" }}>
         <ChatView chat={currentChat} />
       </div>
     </div>
