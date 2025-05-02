@@ -30,10 +30,12 @@ export default function SidebarLayout({
   return (
     <SidebarProvider>
       <div className="flex h-screen flex-1 flex-col">
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1">
           <ChatSidebar chats={chats} />
 
-          <main className="flex flex-1 flex-col gap-4">{children}</main>
+          <main className="relative flex h-full max-w-full flex-1 flex-col overflow-hidden">
+            {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>

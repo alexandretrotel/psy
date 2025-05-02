@@ -11,6 +11,7 @@ import { Loader2Icon, Send } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
 import { Markdown } from "./wrappers/markdown";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ChatViewProps {
   onChatsUpdated: () => void;
@@ -43,7 +44,7 @@ export function ChatView({ onChatsUpdated }: ChatViewProps) {
 
   return (
     <div className="flex h-full flex-1 flex-col gap-4 p-4">
-      <div className="bg-background/50 flex-1 overflow-y-auto">
+      <ScrollArea className="bg-background/50 flex-1">
         <div className="p-4">
           {messages.length > 0 ? (
             <ul className="space-y-4">
@@ -79,7 +80,7 @@ export function ChatView({ onChatsUpdated }: ChatViewProps) {
             </div>
           )}
         </div>
-      </div>
+      </ScrollArea>
 
       <form
         onSubmit={handleSubmit}

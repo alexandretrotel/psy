@@ -16,8 +16,8 @@ export default function Home() {
   };
 
   return (
-    <>
-      <header className="flex items-center justify-between border-b p-4">
+    <div className="transition-width relative h-full w-full flex-1 overflow-auto">
+      <header className="sticky top-0 flex items-center justify-between border-b p-4">
         <div className="flex items-center gap-4">
           <SidebarTrigger />
         </div>
@@ -28,6 +28,6 @@ export default function Home() {
       <div className="flex-1 px-4 pb-4">
         <ChatView onChatsUpdated={fetchData} />
       </div>
-    </>
+    </div>
   );
 }
