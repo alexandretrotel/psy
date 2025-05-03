@@ -78,3 +78,7 @@ export async function clearChat(chatId: string) {
     await db.chats.delete(chatId);
   }
 }
+
+export async function getAllSummaries() {
+  return db.summaries.toArray();
+}

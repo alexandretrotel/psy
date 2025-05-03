@@ -14,7 +14,7 @@ export const useSummary = () => {
       setSummary((await getLatestSummary()) || "No summary yet.");
     } catch (error) {
       setError(
-        error instanceof Error ? error.message : "Failed to fetch chats.",
+        error instanceof Error ? error.message : "Failed to fetch summary.",
       );
     } finally {
       setLoading(false);

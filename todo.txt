@@ -1,2 +1,1 @@
-- show history of all summaries on summary page too
 - refactor UI and code
