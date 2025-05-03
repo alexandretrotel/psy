@@ -29,11 +29,8 @@ export function SummaryView({
     api: "/api/summary",
     body: { chatHistory: chats, prompt },
     onFinish: async (prompt, completion) => {
-      if (prompt.trim() === "") {
-        await saveSummary(completion);
-      } else {
-        // TODO: Handle the case when a question is asked
-      }
+      const finalPrompt = prompt.trim() !== "" ? prompt : undefined;
+      await saveSummary(completion, finalPrompt);
 
       onSummaryUpdated(completion);
       toast.success("Summary generated!");
@@ -94,7 +91,7 @@ export function SummaryView({
                   onClick={async () => {
                     try {
                       setDialogOpen(false);
-                      await complete("");
+                      await complete(prompt);
                     } catch (error) {
                       toast.error(
                         error instanceof Error

@@ -10,6 +10,7 @@ interface Chat {
 
 interface Summary {
   id?: string;
+  prompt?: string;
   summary: string;
   generatedAt: Date;
 }

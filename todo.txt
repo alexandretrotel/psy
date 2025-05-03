@@ -1,2 +1,1 @@
 - refactor UI and code
-- save summary with specific prompt support too (see: // TODO)

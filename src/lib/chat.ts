@@ -39,8 +39,9 @@ export async function getAllChats() {
   return db.chats.toArray();
 }
 
-export async function saveSummary(summary: string) {
+export async function saveSummary(summary: string, prompt?: string) {
   await db.summaries.add({
+    prompt,
     summary,
     generatedAt: new Date(),
   });
