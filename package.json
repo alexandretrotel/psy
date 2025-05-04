@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "standalone": "bun run server.js"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^0.2.13",
