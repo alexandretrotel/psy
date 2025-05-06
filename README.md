@@ -1,5 +1,7 @@
 # Psy
 
+A psychologist in your pocket.
+
 ## Installation
 
 Run the following Docker command and make sure you are logged in:
