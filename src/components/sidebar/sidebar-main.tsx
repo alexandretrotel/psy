@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { format } from "date-fns";
 import { Sidebar } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -11,38 +10,36 @@ import { Chat } from "@/lib/db";
 import { useChatStore } from "@/stores/chat.store";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { BotMessageSquareIcon } from "lucide-react";
-import { Controls } from "./controls";
+import { SidebarControls } from "./sidebar-controls";
 import { useChats } from "@/hooks/use-chats";
 import { useSummary } from "@/hooks/use-summary";
+import { SidebarChatButton } from "./sidebar-chat-button";
 
-interface ChatSidebarProps {
+interface SidebarMainProps {
   chats: Chat[];
 }
 
-export function ChatSidebar({ chats }: ChatSidebarProps) {
+export function SidebarMain({ chats }: SidebarMainProps) {
   const { selectedChatId, setSelectedChatId } = useChatStore();
   const pathname = usePathname();
+  const isOnHomePage = pathname === "/";
 
   const { fetchChats } = useChats();
   const { fetchSummary } = useSummary();
 
-  const fetchData = async () => {
-    await fetchChats();
-    await fetchSummary();
-  };
-
   useEffect(() => {
+    const chatExists = chats.some((chat) => chat.id === selectedChatId);
     if (!selectedChatId && chats.length > 0) {
       setSelectedChatId(chats[0].id!);
-    } else if (
-      selectedChatId &&
-      !chats.some((chat) => chat.id === selectedChatId)
-    ) {
+    } else if (selectedChatId && !chatExists) {
       setSelectedChatId(chats[0]?.id);
     }
   }, [chats, selectedChatId, setSelectedChatId]);
 
-  const isAnotherPage = pathname !== "/";
+  const handleDataImport = async () => {
+    await fetchChats();
+    await fetchSummary();
+  };
 
   return (
     <Sidebar className="w-64 border-r">
@@ -52,6 +49,7 @@ export function ChatSidebar({ chats }: ChatSidebarProps) {
             <h2 className="text-lg font-semibold">Chat History</h2>
             <ModeToggle />
           </div>
+
           <ScrollArea>
             {chats.length === 0 ? (
               <p className="text-muted-foreground">No chats yet.</p>
@@ -59,7 +57,7 @@ export function ChatSidebar({ chats }: ChatSidebarProps) {
               <ul className="space-y-2">
                 <li>
                   <Button
-                    variant={isAnotherPage ? "secondary" : "ghost"}
+                    variant={isOnHomePage ? "ghost" : "secondary"}
                     className="w-full justify-start"
                     asChild
                   >
@@ -70,39 +68,17 @@ export function ChatSidebar({ chats }: ChatSidebarProps) {
                   </Button>
                 </li>
 
-                {chats.map(({ id, date }) => {
-                  const formattedDate = format(new Date(date), "MMM d, yyyy");
-
-                  return (
-                    <li key={id}>
-                      {isAnotherPage ? (
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start"
-                          asChild
-                        >
-                          <Link href="/">{formattedDate}</Link>
-                        </Button>
-                      ) : (
-                        <Button
-                          variant={
-                            selectedChatId === id ? "secondary" : "ghost"
-                          }
-                          className="w-full justify-start"
-                          onClick={() => setSelectedChatId(id!)}
-                        >
-                          {formattedDate}
-                        </Button>
-                      )}
-                    </li>
-                  );
-                })}
+                {chats.map(({ id, date }) => (
+                  <li key={id}>
+                    <SidebarChatButton id={id!} date={date} />
+                  </li>
+                ))}
               </ul>
             )}
           </ScrollArea>
         </div>
 
-        <Controls onDataImported={fetchData} />
+        <SidebarControls onDataImported={handleDataImport} />
       </div>
     </Sidebar>
   );

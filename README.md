@@ -4,20 +4,16 @@ A psychologist in your pocket.
 
 ## Installation
 
-Add these aliases in your PATH:
+Clone this repository:
 
 ```bash
-alias psy-pull="docker pull atrtdeee/psy:latest"
-alias psy-init="docker run -d --name psy-container -p 3000:3000 atrtdeee/psy:latest"
-alias psy-start="docker start psy-container"
-alias psy-stop="docker stop psy-container"
+git clone https://github.com/alexandretrotel/psy
+cd psy
 ```
 
-Run the following commands to get started:
+Build the Next.js application and start it !
 
 ```bash
-docker login
-psy-pull
-psy-init
-psy-start
+bun run build
+bun run standalone
 ```

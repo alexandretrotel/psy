@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatView } from "@/components/chat-view";
+import { ChatView } from "@/components/chat/chat-view";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useChats } from "@/hooks/use-chats";
@@ -21,9 +21,13 @@ export default function Home() {
   }, [selectedChatId, chats, setCurrentChat]);
 
   const initChat = useCallback(async () => {
-    const chat = await getOrCreateTodayChat();
-    setSelectedChatId(chat.id);
-    setCurrentChat(chat);
+    try {
+      const chat = await getOrCreateTodayChat();
+      setSelectedChatId(chat.id);
+      setCurrentChat(chat);
+    } catch {
+      toast.error("Failed to initialize chat.");
+    }
   }, [setCurrentChat, setSelectedChatId]);
 
   useEffect(() => {
@@ -33,16 +37,14 @@ export default function Home() {
   }, [chats.length, initChat]);
 
   const clear = async () => {
-    try {
-      if (!currentChat?.id) {
-        toast.error("No chat selected");
-        return;
-      }
+    if (!currentChat?.id) {
+      return toast.error("No chat selected");
+    }
 
-      await clearChat(currentChat?.id);
+    try {
+      await clearChat(currentChat.id);
       await fetchChats();
       await initChat();
-
       toast.success("Chat cleared");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "An error occurred");
@@ -52,10 +54,7 @@ export default function Home() {
   return (
     <div className="transition-width relative h-screen min-h-screen w-full">
       <header className="bg-background sticky top-0 z-50 flex h-16 items-center justify-between border-b p-4">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger />
-        </div>
-
+        <SidebarTrigger />
         <Button variant="outline" size="sm" onClick={clear}>
           Clear Chat
         </Button>

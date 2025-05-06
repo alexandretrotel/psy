@@ -6,37 +6,41 @@ import { exportData, importData } from "@/lib/chat";
 import { saveAs } from "file-saver";
 import { toast } from "sonner";
 
-interface ExportImportControlsProps {
+interface SidebarControlsProps {
   onDataImported: () => void;
 }
 
-export function Controls({ onDataImported }: ExportImportControlsProps) {
+export function SidebarControls({ onDataImported }: SidebarControlsProps) {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const triggerFileSelect = () => {
+  const setFileInputEmpty = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.click();
+      fileInputRef.current.value = "";
     }
+  };
+
+  const triggerFileSelect = () => {
+    fileInputRef.current?.click();
   };
 
   const handleExport = async () => {
     setLoading(true);
     try {
       const data = await exportData();
-
       const blob = new Blob([JSON.stringify(data, null, 2)], {
         type: "application/json",
       });
-      saveAs(blob, "psychologue.json");
 
+      saveAs(blob, "psychologue.json");
       toast.success("Data exported successfully!");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to export data.",
       );
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,16 +54,15 @@ export function Controls({ onDataImported }: ExportImportControlsProps) {
 
       await importData(data);
       onDataImported();
-
       toast.success("Data imported successfully!");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to import data.",
       );
+    } finally {
+      setLoading(false);
+      setFileInputEmpty();
     }
-    setLoading(false);
-
-    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
@@ -77,12 +80,12 @@ export function Controls({ onDataImported }: ExportImportControlsProps) {
         >
           Import Data
         </Button>
+
         <input
-          id="file-input"
           type="file"
           ref={fileInputRef}
-          onChange={handleImport}
           accept=".json"
+          onChange={handleImport}
           className="hidden"
           disabled={loading}
         />

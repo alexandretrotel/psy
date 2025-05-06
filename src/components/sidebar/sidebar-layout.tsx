@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatSidebar } from "@/components/chat-sidebar";
+import { SidebarMain } from "@/components/sidebar/sidebar-main";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useChats } from "@/hooks/use-chats";
 import { getOrCreateTodayChat } from "@/lib/chat";
@@ -31,7 +31,7 @@ export default function SidebarLayout({
     <SidebarProvider>
       <div className="flex h-screen flex-1 flex-col">
         <div className="flex flex-1">
-          <ChatSidebar chats={chats} />
+          <SidebarMain chats={chats} />
 
           <main className="relative flex h-full max-w-full flex-1 flex-col">
             {children}
