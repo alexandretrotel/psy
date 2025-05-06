@@ -29,7 +29,8 @@ COPY --from=builder /app/public ./public
 
 # Expose port 3000
 ENV NODE_ENV=production
+ENV PORT=3000
 EXPOSE 3000
 
 # Run the production server with Bun
-CMD ["bun", "server.js"]
+CMD ["bun", "server.js", "--host", "0.0.0.0", "--port", "3000"]
