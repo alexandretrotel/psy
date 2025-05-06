@@ -25,6 +25,7 @@ WORKDIR /app
 # Copy the standalone build and static files from the builder stage
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
 # Expose port 3000
 EXPOSE 3000
