@@ -30,9 +30,5 @@ COPY --from=builder /app/public ./public
 # Expose port 3000
 EXPOSE 3000
 
-# Set environment variables (optional, can be overridden)
-ENV AI_BASE_URL=http://host.docker.internal:1234/v1
-ENV PORT=3000
-
 # Run the production server with Bun
 CMD ["bun", "run", "standalone"]
