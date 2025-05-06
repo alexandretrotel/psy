@@ -1,9 +1,11 @@
 import { streamText } from "ai";
 import { model } from "@/lib/ai";
 import { Chat } from "@/lib/db";
+import { system } from "@/data/prompts";
 
 export async function POST(request: Request) {
   const { chatHistory, prompt } = await request.json();
+
   if (!chatHistory || chatHistory.length === 0) {
     return Response.json("No chats to summarize.");
   }
@@ -13,24 +15,17 @@ export async function POST(request: Request) {
     messages: chat.messages,
   }));
 
-  let aiPrompt: string | null = null;
+  let userPrompt: string | null = null;
   if (prompt) {
-    aiPrompt = `From the following chat history, summarize the user's state of mind, focusing on key emotional themes, recurring concerns, and insights. Keep the summary brief and empathetic:\n${JSON.stringify(
-      chatContents,
-      null,
-      2,
-    )}`;
+    userPrompt = `À partir de l'historique des discussions ci-dessous, résume l'état émotionnel de l'utilisateur. Identifie les thèmes émotionnels clés, les préoccupations récurrentes et propose des suggestions bienveillantes (par exemple, "vous pourriez vous sentir..."). Fais référence à des éléments précis des discussions pour ancrer tes observations :\n${JSON.stringify(chatContents, null, 2)}`;
   } else {
-    aiPrompt = `From the following chat history, summarize the user's state of mind, focusing on key emotional themes, recurring concerns, and insights. The summary should focus on what the user has asked:\n${prompt}\nAnd the chat history:\n${JSON.stringify(
-      chatContents,
-      null,
-      2,
-    )}`;
+    userPrompt = `À partir de l'historique des discussions ci-dessous, réponds à la demande de l'utilisateur : "${prompt}". Fournis un résumé ou des insights en lien avec sa demande, en identifiant les thèmes émotionnels et préoccupations pertinents. Faites référence à des éléments précis des discussions pour ancrer tes observations :\n${JSON.stringify(chatContents, null, 2)}`;
   }
 
   const result = streamText({
     model,
-    prompt: aiPrompt,
+    system,
+    prompt: userPrompt,
     temperature: 0.8, // Slightly higher for nuanced insights
     maxTokens: 150, // Short, focused summaries
     topP: 0.85, // Slightly more focused than chat route
