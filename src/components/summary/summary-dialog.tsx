@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,11 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2Icon } from "lucide-react";
-import { toast } from "sonner";
-import { useCompletion } from "@ai-sdk/react";
-import { saveSummary } from "@/lib/chat";
-import { useChats } from "@/hooks/use-chats";
-import { useSummaries } from "@/hooks/use-summaries";
+import { useSummaryDialog } from "@/hooks/features/use-summary-dialog";
 
 interface SummaryDialogProps {
   setCompletion: (completion: string) => void;
@@ -27,51 +22,14 @@ export function SummaryDialog({
   setCompletion,
   onSummaryUpdated,
 }: SummaryDialogProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [prompt, setPrompt] = useState("");
-
-  const { chats } = useChats();
-  const { fetchSummaries } = useSummaries();
-
-  const { complete, completion, isLoading } = useCompletion({
-    api: "/api/summary",
-    body: { chatHistory: chats, prompt },
-    onFinish: async (_, result) => {
-      try {
-        const finalPrompt = prompt.trim() || undefined;
-        await saveSummary(result, finalPrompt);
-        await fetchSummaries();
-        onSummaryUpdated(result);
-        toast.success("Summary generated!");
-      } catch {
-        toast.error("Failed to save summary.");
-      }
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "An error occurred");
-    },
-  });
-
-  useEffect(() => {
-    setCompletion(completion ?? "");
-  }, [completion, setCompletion]);
-
-  const handlePromptChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setPrompt(e.target.value);
-    },
-    [],
-  );
-
-  const handleGenerate = async () => {
-    try {
-      setDialogOpen(false);
-      await complete(prompt);
-      setPrompt("");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An error occurred");
-    }
-  };
+  const {
+    dialogOpen,
+    setDialogOpen,
+    prompt,
+    isLoading,
+    handlePromptChange,
+    handleGenerate,
+  } = useSummaryDialog(setCompletion, onSummaryUpdated);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

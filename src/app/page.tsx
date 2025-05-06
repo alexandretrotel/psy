@@ -4,52 +4,11 @@ import { ChatView } from "@/components/chat/chat-view";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useChats } from "@/hooks/use-chats";
-import { clearChat, getOrCreateTodayChat } from "@/lib/chat";
-import { useChatStore } from "@/stores/chat.store";
-import { useCallback, useEffect } from "react";
-import { toast } from "sonner";
+import { useInitChat } from "@/hooks/features/use-init-chat";
 
 export default function Home() {
-  const { chats, fetchChats, currentChat, setCurrentChat } = useChats();
-  const { selectedChatId, setSelectedChatId } = useChatStore();
-
-  useEffect(() => {
-    const chat = chats.find((chat) => chat.id === selectedChatId);
-    if (chat) {
-      setCurrentChat(chat);
-    }
-  }, [selectedChatId, chats, setCurrentChat]);
-
-  const initChat = useCallback(async () => {
-    try {
-      const chat = await getOrCreateTodayChat();
-      setSelectedChatId(chat.id);
-      setCurrentChat(chat);
-    } catch {
-      toast.error("Failed to initialize chat.");
-    }
-  }, [setCurrentChat, setSelectedChatId]);
-
-  useEffect(() => {
-    if (chats.length === 0) {
-      initChat();
-    }
-  }, [chats.length, initChat]);
-
-  const clear = async () => {
-    if (!currentChat?.id) {
-      return toast.error("No chat selected");
-    }
-
-    try {
-      await clearChat(currentChat.id);
-      await fetchChats();
-      await initChat();
-      toast.success("Chat cleared");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An error occurred");
-    }
-  };
+  const { currentChat } = useChats();
+  const { clear } = useInitChat();
 
   return (
     <div className="transition-width relative h-screen min-h-screen w-full">

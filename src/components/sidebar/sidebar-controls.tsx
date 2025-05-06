@@ -1,69 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { exportData, importData } from "@/lib/chat";
-import { saveAs } from "file-saver";
-import { toast } from "sonner";
+import { useSidebarControls } from "@/hooks/features/use-sidebar-controls";
 
 interface SidebarControlsProps {
   onDataImported: () => void;
 }
 
 export function SidebarControls({ onDataImported }: SidebarControlsProps) {
-  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const setFileInputEmpty = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const triggerFileSelect = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleExport = async () => {
-    setLoading(true);
-    try {
-      const data = await exportData();
-      const blob = new Blob([JSON.stringify(data, null, 2)], {
-        type: "application/json",
-      });
-
-      saveAs(blob, "psychologue.json");
-      toast.success("Data exported successfully!");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to export data.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setLoading(true);
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-
-      await importData(data);
-      onDataImported();
-      toast.success("Data imported successfully!");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to import data.",
-      );
-    } finally {
-      setLoading(false);
-      setFileInputEmpty();
-    }
-  };
+  const { loading, triggerFileSelect, handleExport, handleImport } =
+    useSidebarControls(fileInputRef, onDataImported);
 
   return (
     <div className="flex w-full gap-4">

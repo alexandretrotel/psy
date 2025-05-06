@@ -1,40 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Chat } from "@/lib/db";
-import { useChatStore } from "@/stores/chat.store";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { BotMessageSquareIcon } from "lucide-react";
 import { SidebarControls } from "./sidebar-controls";
 import { useChats } from "@/hooks/use-chats";
 import { useSummary } from "@/hooks/use-summary";
 import { SidebarChatButton } from "./sidebar-chat-button";
+import { useInitChatSelection } from "@/hooks/features/use-init-chat-selection";
 
 interface SidebarMainProps {
   chats: Chat[];
 }
 
 export function SidebarMain({ chats }: SidebarMainProps) {
-  const { selectedChatId, setSelectedChatId } = useChatStore();
   const pathname = usePathname();
   const isOnHomePage = pathname === "/";
 
   const { fetchChats } = useChats();
   const { fetchSummary } = useSummary();
 
-  useEffect(() => {
-    const chatExists = chats.some((chat) => chat.id === selectedChatId);
-    if (!selectedChatId && chats.length > 0) {
-      setSelectedChatId(chats[0].id!);
-    } else if (selectedChatId && !chatExists) {
-      setSelectedChatId(chats[0]?.id);
-    }
-  }, [chats, selectedChatId, setSelectedChatId]);
+  useInitChatSelection(chats);
 
   const handleDataImport = async () => {
     await fetchChats();
