@@ -1,7 +1,7 @@
 import { getOrCreateTodayChat, clearChat } from "@/lib/chat";
 import { useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { useChats } from "./use-chats";
+import { useChats } from "@/hooks/use-chats";
 import { useChatStore } from "@/stores/chat.store";
 
 export function useInitChat() {
